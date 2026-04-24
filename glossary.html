@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glosario IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --accent: #7c6af7;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --tag-bg: #1a1a2e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1.5rem 4rem;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.4;
+  }
+  header { max-width: 900px; margin: 0 auto 2.5rem; }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; line-height: 1; letter-spacing: -0.03em; }
+  h1 span { color: var(--accent); }
+  .subtitle { margin-top: 1rem; color: var(--muted); font-size: 1rem; max-width: 480px; line-height: 1.6; }
+
+  .lang-toggle {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    height: fit-content;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+  }
+  .lang-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.55rem 1.1rem;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .lang-btn.active { background: var(--accent); color: #fff; }
+  .lang-divider { width: 1px; height: 2rem; background: var(--border); }
+
+  .line { width: 100%; height: 1px; background: linear-gradient(90deg, var(--accent) 0%, transparent 80%); margin: 2rem 0; }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; flex: 1; }
+  .filter-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(124,106,247,0.1); }
+  .search-input {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    padding: 0.45rem 1rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 180px;
+  }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { border-color: var(--accent); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.25rem; max-width: 900px; margin: 0 auto; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.2s;
+    cursor: default;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: var(--card-color, var(--accent)); opacity: 0; transition: opacity 0.25s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; gap: 1rem; }
+  .card-title { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+  .card-abbr { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 0.2rem; min-height: 1em; }
+  .card-tag {
+    font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.3rem 0.7rem; border-radius: 100px;
+    background: var(--tag-bg); color: var(--card-color, var(--accent));
+    border: 1px solid var(--card-color, var(--accent)); white-space: nowrap; flex-shrink: 0;
+  }
+  .card-desc { color: #a8a8c0; font-size: 0.93rem; line-height: 1.65; margin-bottom: 1.25rem; }
+  .card-uses { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .card-uses li { font-size: 0.82rem; color: var(--muted); padding-left: 1.2rem; position: relative; line-height: 1.5; }
+  .card-uses li::before { content: '→'; position: absolute; left: 0; color: var(--card-color, var(--accent)); font-size: 0.75rem; }
+  .card-analogy { margin-top: 1.25rem; padding: 0.85rem 1rem; background: rgba(255,255,255,0.03); border-left: 2px solid var(--card-color, var(--accent)); border-radius: 0 6px 6px 0; }
+  .analogy-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--card-color, var(--accent)); margin-bottom: 0.35rem; }
+  .card-analogy p { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+  .interview-badge {
+    font-family: 'Space Mono', monospace; font-size: 0.58rem; letter-spacing: 0.08em;
+    padding: 0.2rem 0.55rem; border-radius: 4px;
+    background: rgba(247,201,72,0.1); color: #f7c948;
+    border: 1px solid rgba(247,201,72,0.3); display: inline-block; margin-top: 0.4rem;
+  }
+
+  .relation-section { max-width: 900px; margin: 3rem auto 0; }
+  .relation-section h2 { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; color: var(--muted); margin-bottom: 1.25rem; }
+  .stack-diagram {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 2rem; font-family: 'Space Mono', monospace; display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .stack-row { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .stack-label { color: var(--muted); font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; width: 90px; flex-shrink: 0; }
+  .stack-items { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .stack-item { padding: 0.35rem 0.85rem; border-radius: 6px; font-size: 0.72rem; border: 1px solid; }
+  .stack-arrow { color: var(--border); font-size: 1rem; margin: 0.1rem 0; padding-left: 90px; }
+  .no-results { grid-column: 1/-1; text-align: center; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.8rem; padding: 3rem; }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr; }
+    h1 { font-size: 2.2rem; }
+    .search-input { width: 100%; }
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="label">// referencia rápida</div>
+      <h1>Glosario <span>IA</span></h1>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btn-es" onclick="setLang('es')">ES</button>
+      <div class="lang-divider"></div>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+  <p class="subtitle" id="header-subtitle">Los términos clave del ecosistema de modelos de lenguaje, explicados sin vueltas.</p>
+  <div class="line"></div>
+</header>
+
+<div class="toolbar">
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">Todos</button>
+    <button class="filter-btn" data-filter="core">Core</button>
+    <button class="filter-btn" data-filter="framework">Framework</button>
+    <button class="filter-btn" data-filter="concepto">Concepto</button>
+    <button class="filter-btn" data-filter="herramienta">Herramienta</button>
+  </div>
+  <input class="search-input" id="search" type="text" placeholder="buscar..." oninput="renderCards()">
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="relation-section">
+  <div class="line"></div>
+  <h2 id="diagram-title">// Cómo se relacionan en un sistema típico</h2>
+  <div class="stack-diagram">
+    <div class="stack-row">
+      <span class="stack-label" id="lbl-app">Capa app</span>
+      <div class="stack-items">
+        <span class="stack-item" style="color:#a3e635;border-color:#a3e635;background:rgba(163,230,53,0.08)">LangChain</span>
+        <span class="stack-item" style="color:#7c6af7;border-color:#7c6af7;background:rgba(124,106,247,0.08)">LangGraph</span>
+      </div>
+    </div>
+    <div class="stack-arrow" id="arrow1">↓ orquestan</div>
+    <div class="stack-row">
+      <span class="stack-label" id="lbl-concept">Concepto</span>
+      <div class="stack-items">
+        <span class="stack-item" style="color:#fb923c;border-color:#fb923c;background:rgba(251,146,60,0.08)" id="d-agent">Agente</span>
+        <span class="stack-item" style="color:#f7c948;border-color:#f7c948;background:rgba(247,201,72,0.08)">RAG</span>
+        <span class="stack-item" style="color:#f472b6;border-color:#f472b6;background:rgba(244,114,182,0.08)">Tool Calling</span>
+        <span class="stack-item" style="color:#4ade80;border-color:#4ade80;background:rgba(74,222,128,0.08)">Chain of Thought</span>
+        <span class="stack-item" style="color:#fb7185;border-color:#fb7185;background:rgba(251,113,133,0.08)" id="d-guards">Guardrails</span>
+      </div>
+    </div>
+    <div class="stack-arrow" id="arrow2">↓ usan</div>
+    <div class="stack-row">
+      <span class="stack-label" id="lbl-engine">Motor</span>
+      <div class="stack-items">
+        <span class="stack-item" style="color:#7c6af7;border-color:#7c6af7;background:rgba(124,106,247,0.08)">LLM</span>
+        <span class="stack-item" style="color:#34d399;border-color:#34d399;background:rgba(52,211,153,0.08)">Embeddings</span>
+        <span class="stack-item" style="color:#e879f9;border-color:#e879f9;background:rgba(232,121,249,0.08)">Vector Store</span>
+      </div>
+    </div>
+    <div class="stack-arrow" id="arrow3">↓ estructurado por</div>
+    <div class="stack-row">
+      <span class="stack-label" id="lbl-utils">Utilidades</span>
+      <div class="stack-items">
+        <span class="stack-item" style="color:#22d3ee;border-color:#22d3ee;background:rgba(34,211,238,0.08)">Pydantic</span>
+        <span class="stack-item" style="color:#818cf8;border-color:#818cf8;background:rgba(129,140,248,0.08)">Prompt</span>
+        <span class="stack-item" style="color:#94a3b8;border-color:#94a3b8;background:rgba(148,163,184,0.08)" id="d-ctx">Context Window</span>
+        <span class="stack-item" style="color:#a78bfa;border-color:#a78bfa;background:rgba(167,139,250,0.08)">Token</span>
+        <span class="stack-item" style="color:#fbbf24;border-color:#fbbf24;background:rgba(251,191,36,0.08)">Temperature</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CARDS = [
+  {
+    id:'llm', color:'#7c6af7', category:'core', interview:true,
+    title:{es:'LLM',en:'LLM'}, abbr:{es:'Large Language Model',en:'Large Language Model'}, tag:{es:'core',en:'core'},
+    desc:{
+      es:'El motor de todo. Un modelo de IA entrenado sobre enormes cantidades de texto que puede generar, resumir, traducir y razonar con lenguaje natural. Son la base sobre la que se construye todo lo demás.',
+      en:'The engine behind everything. An AI model trained on massive amounts of text that can generate, summarize, translate, and reason in natural language. Everything else is built on top of these.'
+    },
+    uses:{
+      es:['GPT-4, Claude, Gemini, Llama son LLMs','Reciben texto de entrada (prompt) y devuelven texto','No tienen memoria entre conversaciones por sí solos'],
+      en:['GPT-4, Claude, Gemini, Llama are all LLMs','They receive text input (prompt) and return text','They have no memory between conversations on their own']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Un cerebro muy inteligente que lee todo lo que le ponés enfrente, pero olvida todo al terminar la conversación.',
+        en:'A very smart brain that reads everything you put in front of it, but forgets everything once the conversation ends.'
+      }
+    }
+  },
+  {
+    id:'token', color:'#a78bfa', category:'core', interview:true,
+    title:{es:'Token',en:'Token'}, abbr:{es:'Unidad mínima de texto',en:'Minimal text unit'}, tag:{es:'core',en:'core'},
+    desc:{
+      es:'Los LLMs no procesan letras ni palabras enteras: procesan <em>tokens</em>. Un token es un fragmento de texto, típicamente 3–4 caracteres. Es la unidad de medida para costo, velocidad y límites de contexto.',
+      en:'LLMs do not process individual letters or full words — they process <em>tokens</em>. A token is a text chunk, typically 3–4 characters. It is the unit of measurement for cost, speed, and context limits.'
+    },
+    uses:{
+      es:['"hola mundo" ≈ 3 tokens','Los modelos tienen un límite de tokens de contexto (ej: 200k)','Los proveedores cobran por tokens de entrada + salida'],
+      en:['"hello world" ≈ 3 tokens','Models have a context token limit (e.g. 200k)','Providers charge per input + output tokens']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Como sílabas, pero irregulares. El "combustible" que el modelo consume.',
+        en:'Like syllables, but irregular. The "fuel" the model consumes.'
+      }
+    }
+  },
+  {
+    id:'prompt', color:'#818cf8', category:'core', interview:true,
+    title:{es:'Prompt',en:'Prompt'}, abbr:{es:'Instrucción al modelo',en:'Input instruction to the model'}, tag:{es:'core',en:'core'},
+    desc:{
+      es:'El texto que le enviás al LLM como entrada. Puede ser una pregunta, instrucción, rol, ejemplos o contexto. <strong>Prompt engineering</strong> es el arte de diseñar prompts para obtener mejores respuestas.',
+      en:'The text you send to the LLM as input. Can be a question, instruction, role, examples, or context. <strong>Prompt engineering</strong> is the craft of designing prompts to get better outputs.'
+    },
+    uses:{
+      es:['System prompt: instrucciones fijas que definen el comportamiento','Few-shot: incluir ejemplos para guiar la respuesta','Chain-of-thought: pedirle que razone paso a paso'],
+      en:['System prompt: fixed instructions that define behavior','Few-shot: include examples to guide the response','Chain-of-thought: ask the model to reason step by step']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'La forma en que le formulás una pregunta a un experto cambia totalmente la calidad de la respuesta.',
+        en:'The way you phrase a question to an expert completely changes the quality of the answer you receive.'
+      }
+    }
+  },
+  {
+    id:'context', color:'#94a3b8', category:'core', interview:true,
+    title:{es:'Context Window',en:'Context Window'}, abbr:{es:'Ventana de contexto',en:'Context window'}, tag:{es:'core',en:'core'},
+    desc:{
+      es:'La cantidad máxima de tokens que un LLM puede "ver" en una sola llamada: historial de chat, instrucciones del sistema, documentos y la respuesta a generar. Todo entra acá.',
+      en:'The maximum number of tokens an LLM can "see" in a single call: chat history, system instructions, documents, and the response to generate. Everything goes in here.'
+    },
+    uses:{
+      es:['GPT-4 Turbo: ~128k tokens · Claude 3.5: ~200k tokens','Al llenarse, el modelo "olvida" lo más antiguo','Más contexto = más caro y más lento'],
+      en:['GPT-4 Turbo: ~128k tokens · Claude 3.5: ~200k tokens','When full, the model "forgets" the oldest content','More context = more expensive and slower']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'La RAM del modelo: todo lo que cabe ahí es lo que puede usar para razonar en ese momento.',
+        en:"The model's RAM: everything that fits there is what it can use to reason at that moment."
+      }
+    }
+  },
+  {
+    id:'temperature', color:'#fbbf24', category:'core', interview:true,
+    title:{es:'Temperature',en:'Temperature'}, abbr:{es:'Parámetro de aleatoriedad',en:'Randomness parameter'}, tag:{es:'core',en:'core'},
+    desc:{
+      es:'Parámetro (0 a 2) que controla cuán predecible o creativo es el LLM. Temperatura baja → respuestas consistentes y deterministas. Alta → más variadas y creativas, pero menos precisas.',
+      en:'A parameter (0 to 2) that controls how predictable or creative the LLM is. Low temperature → consistent, deterministic responses. High → more varied and creative, but less precise.'
+    },
+    uses:{
+      es:['0.0–0.3: código, datos, respuestas factuales','0.7–1.0: chatbots, escritura creativa','Muy alta (>1.2): puede volverse incoherente'],
+      en:['0.0–0.3: code, data, factual answers','0.7–1.0: chatbots, creative writing','Very high (>1.2): output may become incoherent']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'El dial de "creatividad" del modelo: 0 es un contador meticuloso, 2 es un poeta que improvisa.',
+        en:"The model's creativity dial: 0 is a meticulous accountant, 2 is an improvising poet."
+      }
+    }
+  },
+  {
+    id:'hallucination', color:'#f87171', category:'concepto', interview:true,
+    title:{es:'Alucinación',en:'Hallucination'}, abbr:{es:'Hallucination',en:'Fabricated output'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'Cuando un LLM genera información falsa con total confianza. El modelo no sabe lo que no sabe: si le faltan datos, <em>inventa</em> respuestas plausibles. Es uno de los mayores desafíos del campo.',
+      en:"When an LLM generates false information with full confidence. The model doesn't know what it doesn't know: if it lacks data, it <em>fabricates</em> plausible-sounding answers. One of the field's biggest challenges."
+    },
+    uses:{
+      es:['Puede inventar citas, fechas, nombres o papers inexistentes','RAG y grounding reducen alucinaciones al anclar en fuentes reales','Siempre validar outputs en aplicaciones críticas'],
+      en:['May fabricate quotes, dates, names, or non-existent papers','RAG and grounding reduce hallucinations by anchoring to real sources','Always validate outputs in critical applications']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Un estudiante en un examen que no sabe la respuesta pero escribe algo muy convincente en lugar de decir "no sé".',
+        en:"A student in an exam who doesn't know the answer but writes something convincing instead of saying 'I don't know'."
+      }
+    }
+  },
+  {
+    id:'embedding', color:'#34d399', category:'concepto', interview:true,
+    title:{es:'Embedding',en:'Embedding'}, abbr:{es:'Representación vectorial del texto',en:'Vector representation of text'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'Convertir texto en una lista de números (vector) que captura su <em>significado semántico</em>. Textos similares tienen vectores cercanos en el espacio matemático. Es la base de la búsqueda semántica.',
+      en:'Converting text into a list of numbers (vector) that captures its <em>semantic meaning</em>. Similar texts have vectors that are close in mathematical space. It is the foundation of semantic search.'
+    },
+    uses:{
+      es:['Permite buscar por significado, no solo por palabras exactas','Se almacenan en bases de datos vectoriales','Clave para implementar RAG'],
+      en:['Enables search by meaning, not just exact keywords','Stored in vector databases','Key to implementing RAG']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'"Perro" y "can" quedan cerca en el espacio vectorial aunque sean palabras distintas.',
+        en:'"Dog" and "canine" end up close in vector space even though they are different words.'
+      }
+    }
+  },
+  {
+    id:'vectorstore', color:'#e879f9', category:'herramienta', interview:true,
+    title:{es:'Vector Store',en:'Vector Store'}, abbr:{es:'Base de datos vectorial',en:'Vector database'}, tag:{es:'herramienta',en:'tool'},
+    desc:{
+      es:'Base de datos especializada en almacenar y buscar embeddings eficientemente. En lugar de texto exacto, busca por <em>similitud semántica</em>: "dame los 5 fragmentos más similares a esta pregunta".',
+      en:'A database specialized in efficiently storing and searching embeddings. Instead of exact text, it searches by <em>semantic similarity</em>: "give me the 5 chunks most similar to this question".'
+    },
+    uses:{
+      es:['Ejemplos: Pinecone, Chroma, Weaviate, pgvector (Postgres)','Componente central de cualquier sistema RAG','Escala a millones de documentos con búsqueda rápida'],
+      en:['Examples: Pinecone, Chroma, Weaviate, pgvector (Postgres)','Central component of any RAG system','Scales to millions of documents with fast retrieval']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Una biblioteca organizada por significado, no por título. Pedís "algo sobre perros" y trae todo lo relacionado, aunque no mencione esa palabra.',
+        en:"A library organized by meaning, not by title. You ask for 'something about dogs' and it returns everything related, even if the word isn't used."
+      }
+    }
+  },
+  {
+    id:'rag', color:'#f7c948', category:'concepto', interview:true,
+    title:{es:'RAG',en:'RAG'}, abbr:{es:'Retrieval-Augmented Generation',en:'Retrieval-Augmented Generation'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'Técnica que combina búsqueda con generación. Antes de responder, el sistema recupera fragmentos relevantes de una base de conocimiento propia y los incluye en el contexto del LLM.',
+      en:'A technique combining retrieval with generation. Before responding, the system fetches relevant chunks from a knowledge base and includes them in the LLM context.'
+    },
+    uses:{
+      es:['El modelo responde sobre <em>tus</em> datos sin re-entrenarlo','Reduce alucinaciones al anclar en fuentes reales','Flujo: pregunta → buscar docs → LLM responde con esos docs'],
+      en:['The model answers about <em>your</em> data without retraining','Reduces hallucinations by grounding in real sources','Flow: question → retrieve docs → LLM answers with those docs']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Un abogado que antes de opinar busca jurisprudencia específica, en lugar de responder solo de memoria.',
+        en:'A lawyer who looks up specific case law before giving an opinion, rather than answering purely from memory.'
+      }
+    }
+  },
+  {
+    id:'agent', color:'#fb923c', category:'concepto', interview:true,
+    title:{es:'Agente',en:'Agent'}, abbr:{es:'AI Agent',en:'AI Agent'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'Un LLM que no solo responde, sino que <em>actúa</em>. Puede usar herramientas, tomar decisiones y ejecutar pasos en secuencia adaptándose a los resultados intermedios para cumplir un objetivo.',
+      en:'An LLM that not only responds but <em>acts</em>. It can use tools, make decisions, and execute sequential steps adapting to intermediate results to achieve a goal.'
+    },
+    uses:{
+      es:['Puede buscar en internet, ejecutar código, leer archivos, llamar APIs','Decide por sí solo qué herramienta usar y cuándo','Opera en bucles: acción → observar resultado → siguiente acción'],
+      en:['Can search the web, execute code, read files, call APIs','Decides on its own which tool to use and when','Operates in loops: action → observe result → next action']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Un LLM es un consultor que opina. Un agente es un empleado que además de opinar, <em>hace las cosas</em>.',
+        en:'An LLM is a consultant who advises. An agent is an employee who not only advises but also <em>gets things done</em>.'
+      }
+    }
+  },
+  {
+    id:'toolcalling', color:'#f472b6', category:'concepto', interview:true,
+    title:{es:'Tool Calling',en:'Tool Calling'}, abbr:{es:'Function Calling',en:'Function Calling'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'La capacidad de un LLM de invocar funciones externas definidas por el desarrollador. El modelo decide cuándo y cómo llamarlas, pasando parámetros en formato estructurado (JSON).',
+      en:'The ability of an LLM to invoke external functions defined by the developer. The model decides when and how to call them, passing parameters in structured format (JSON).'
+    },
+    uses:{
+      es:['Ej: tool "buscar_vuelos(origen, destino, fecha)"','El modelo analiza el pedido y llama la función correcta','Es el mecanismo que hace posibles los agentes'],
+      en:['E.g. tool "search_flights(origin, destination, date)"','The model analyzes the request and calls the right function','It\'s the mechanism that makes agents possible']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Darle al modelo un "control remoto" con botones etiquetados que puede presionar cuando lo necesita.',
+        en:"Giving the model a 'remote control' with labeled buttons it can press whenever it needs to."
+      }
+    }
+  },
+  {
+    id:'cot', color:'#4ade80', category:'concepto', interview:true,
+    title:{es:'Chain of Thought',en:'Chain of Thought'}, abbr:{es:'Razonamiento paso a paso (CoT)',en:'Step-by-step reasoning (CoT)'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'Técnica de prompting que le pide al modelo que "piense en voz alta" antes de responder, descomponiendo el problema en pasos. Mejora drásticamente la precisión en razonamiento, matemáticas y lógica.',
+      en:'A prompting technique that asks the model to "think out loud" before answering, breaking the problem into steps. Dramatically improves accuracy on reasoning, math, and logic tasks.'
+    },
+    uses:{
+      es:['Se activa con frases como "pensá paso a paso" o "let\'s think step by step"','Modelos como o1/o3 de OpenAI lo hacen internamente','Base de técnicas avanzadas como Tree of Thought y Self-Consistency'],
+      en:['"Think step by step" or "let\'s reason through this" activates it','Models like OpenAI o1/o3 do it internally','Foundation for Tree of Thought and Self-Consistency']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'La diferencia entre "¿cuánto es 17×24?" versus "calculá 17×24 mostrando el proceso". El resultado es más confiable cuando el razonamiento es explícito.',
+        en:'The difference between "what is 17×24?" vs "calculate 17×24 showing your work". The result is more reliable when the reasoning is made explicit.'
+      }
+    }
+  },
+  {
+    id:'pydantic', color:'#22d3ee', category:'herramienta', interview:false,
+    title:{es:'Pydantic',en:'Pydantic'}, abbr:{es:'Librería de validación de datos (Python)',en:'Data validation library (Python)'}, tag:{es:'herramienta',en:'tool'},
+    desc:{
+      es:'Librería de Python para definir y validar estructuras de datos con tipado estricto. En IA se usa para garantizar que las respuestas del LLM tengan exactamente el formato que esperamos.',
+      en:'Python library for defining and validating data structures with strict typing. In AI it\'s used to guarantee that LLM responses have exactly the format we expect.'
+    },
+    uses:{
+      es:['Define esquemas: "quiero un JSON con nombre (str), edad (int), activo (bool)"','Valida y parsea automáticamente la salida del modelo','Base de librerías como LangChain y FastAPI'],
+      en:['Defines schemas: "I want a JSON with name (str), age (int), active (bool)"','Automatically validates and parses model output','Foundation of libraries like LangChain and FastAPI']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Un molde de repostería: no importa cuánto varíe la masa (output del LLM), el resultado siempre tiene la forma correcta.',
+        en:'A baking mold: no matter how much the batter (LLM output) varies, the result always comes out the right shape.'
+      }
+    }
+  },
+  {
+    id:'langchain', color:'#a3e635', category:'framework', interview:false,
+    title:{es:'LangChain',en:'LangChain'}, abbr:{es:'Framework para apps con LLMs',en:'Framework for LLM-powered apps'}, tag:{es:'framework',en:'framework'},
+    desc:{
+      es:'Framework open-source que conecta LLMs con herramientas, datos y memoria. Su idea central es armar <em>cadenas</em> de pasos: prompt → LLM → parser → siguiente paso.',
+      en:'Open-source framework that connects LLMs with tools, data, and memory. Its core idea is building <em>chains</em> of steps: prompt → LLM → parser → next step.'
+    },
+    uses:{
+      es:['Abstrae distintos LLMs bajo una misma interfaz','Facilita construir RAG pipelines','Manejo de memoria e historial de conversación','Integra cientos de herramientas y fuentes de datos'],
+      en:['Abstracts different LLMs under a unified interface','Makes it easy to build RAG pipelines','Conversation memory and history management','Integrates hundreds of tools and data sources']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'El middleware entre tu app y el modelo. Como Express.js, pero para flujos de IA.',
+        en:'The middleware between your app and the model. Like Express.js, but for AI workflows.'
+      }
+    }
+  },
+  {
+    id:'langgraph', color:'#7c6af7', category:'framework', interview:false,
+    title:{es:'LangGraph',en:'LangGraph'}, abbr:{es:'Orquestación de agentes como grafo',en:'Agent orchestration as a graph'}, tag:{es:'framework',en:'framework'},
+    desc:{
+      es:'Extensión de LangChain para flujos de trabajo complejos modelados como grafos dirigidos (nodos + aristas). Permite ciclos, condicionales, estado persistente y múltiples agentes coordinados.',
+      en:'LangChain extension for complex workflows modeled as directed graphs (nodes + edges). Supports cycles, conditionals, persistent state, and coordinated multi-agent systems.'
+    },
+    uses:{
+      es:['El agente puede revisarse y corregir errores','Flujos ramificados: "si resultado X → nodo A, si no → nodo B"','Ideal para sistemas multi-agente colaborativos','Mantiene estado entre pasos del flujo'],
+      en:['The agent can review itself and correct errors','Branching flows: "if result X → node A, else → node B"','Ideal for collaborative multi-agent systems','Maintains state across flow steps']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Si LangChain es una línea de ensamblaje, LangGraph es el diagrama de flujo completo con bifurcaciones y ciclos de retroalimentación.',
+        en:'If LangChain is an assembly line, LangGraph is the full flowchart with branches and feedback loops.'
+      }
+    }
+  },
+  {
+    id:'finetuning', color:'#f87171', category:'concepto', interview:true,
+    title:{es:'Fine-tuning',en:'Fine-tuning'}, abbr:{es:'Ajuste fino del modelo',en:'Model fine-tuning'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'Re-entrenar un LLM base con ejemplos propios para que adopte un estilo, dominio o comportamiento específico. Más costoso que RAG, pero cambia el comportamiento del modelo a nivel profundo.',
+      en:'Retraining a base LLM on your own examples so it adopts a specific style, domain, or behavior. More expensive than RAG, but changes model behavior at a deep level.'
+    },
+    uses:{
+      es:['Útil cuando necesitás un tono o formato muy específico y consistente','Requiere muchos ejemplos de alta calidad (cientos o miles)','RAG + buen prompt suele ser suficiente en la mayoría de casos'],
+      en:['Useful when you need a very specific, consistent tone or format','Requires many high-quality examples (hundreds or thousands)','RAG + good prompting is usually enough for most use cases']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'RAG es darle documentos para consultar. Fine-tuning es mandarlo a estudiar un año en una escuela especializada.',
+        en:'RAG is giving the model documents to look up. Fine-tuning is sending it to study for a year at a specialized school.'
+      }
+    }
+  },
+  {
+    id:'guardrails', color:'#fb7185', category:'concepto', interview:true,
+    title:{es:'Guardrails',en:'Guardrails'}, abbr:{es:'Barreras de seguridad y validación',en:'Safety & validation layer'}, tag:{es:'concepto',en:'concept'},
+    desc:{
+      es:'Capa de control que envuelve al LLM para asegurar que sus outputs cumplan restricciones de seguridad, formato o política. Pueden ser reglas fijas, otro modelo clasificador, o una combinación.',
+      en:'A control layer that wraps the LLM to ensure its outputs meet safety, format, or policy constraints. Can be hardcoded rules, a classifier model, or a combination.'
+    },
+    uses:{
+      es:['Bloquear temas fuera de alcance ("no hablar de competidores")','Validar que el output tenga el schema correcto antes de usarlo','Detectar contenido dañino, sesgos o violaciones de compliance','Librerías: Guardrails AI, NeMo Guardrails (NVIDIA)'],
+      en:['Block out-of-scope topics ("don\'t mention competitors")','Validate output has the correct schema before using it','Detect harmful content, bias, or compliance violations','Libraries: Guardrails AI, NeMo Guardrails (NVIDIA)']
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'Control de calidad en una fábrica: el producto puede salir bien el 95% del tiempo, pero siempre hay un inspector verificando antes de que llegue al cliente.',
+        en:'Quality control in a factory: the product may come out fine 95% of the time, but there is always an inspector checking before it reaches the customer.'
+      }
+    }
+  }
+];
+
+let lang = 'es';
+let activeFilter = 'all';
+
+const UI = {
+  es: {
+    subtitle: 'Los términos clave del ecosistema de modelos de lenguaje, explicados sin vueltas.',
+    search: 'buscar...',
+    diagramTitle: '// Cómo se relacionan en un sistema típico',
+    filters: { all:'Todos', core:'Core', framework:'Framework', concepto:'Concepto', herramienta:'Herramienta' },
+    layers: { app:'Capa app', concept:'Concepto', engine:'Motor', utils:'Utilidades' },
+    arrows: ['↓ orquestan','↓ usan','↓ estructurado por'],
+    noResults: 'Sin resultados',
+    interviewBadge: '🎯 frecuente en entrevistas'
+  },
+  en: {
+    subtitle: 'Key terms of the language model ecosystem, explained plainly.',
+    search: 'search...',
+    diagramTitle: '// How they relate in a typical system',
+    filters: { all:'All', core:'Core', framework:'Framework', concepto:'Concept', herramienta:'Tool' },
+    layers: { app:'App layer', concept:'Concept', engine:'Engine', utils:'Utilities' },
+    arrows: ['↓ orchestrate','↓ use','↓ structured by'],
+    noResults: 'No results found',
+    interviewBadge: '🎯 common interview topic'
+  }
+};
+
+function renderCards() {
+  const grid = document.getElementById('grid');
+  const search = document.getElementById('search').value.toLowerCase();
+  const u = UI[lang];
+
+  const filtered = CARDS.filter(c => {
+    const matchFilter = activeFilter === 'all' || c.category === activeFilter;
+    const matchSearch = !search ||
+      c.title[lang].toLowerCase().includes(search) ||
+      c.desc[lang].toLowerCase().includes(search) ||
+      (c.abbr[lang]||'').toLowerCase().includes(search);
+    return matchFilter && matchSearch;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="no-results">${u.noResults}</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => `
+    <div class="card" data-category="${c.category}" style="--card-color:${c.color};">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${c.title[lang]}</div>
+          <div class="card-abbr">${c.abbr[lang]}</div>
+          ${c.interview ? `<div class="interview-badge">${u.interviewBadge}</div>` : ''}
+        </div>
+        <span class="card-tag">${c.tag[lang]}</span>
+      </div>
+      <p class="card-desc">${c.desc[lang]}</p>
+      <ul class="card-uses">${c.uses[lang].map(u=>`<li>${u}</li>`).join('')}</ul>
+      <div class="card-analogy">
+        <div class="analogy-label">${c.analogy.label[lang]}</div>
+        <p>${c.analogy.text[lang]}</p>
+      </div>
+    </div>`).join('');
+}
+
+function updateStaticUI() {
+  const u = UI[lang];
+  document.getElementById('header-subtitle').textContent = u.subtitle;
+  document.getElementById('search').placeholder = u.search;
+  document.getElementById('diagram-title').textContent = u.diagramTitle;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.textContent = u.filters[btn.dataset.filter];
+  });
+  document.getElementById('lbl-app').textContent = u.layers.app;
+  document.getElementById('lbl-concept').textContent = u.layers.concept;
+  document.getElementById('lbl-engine').textContent = u.layers.engine;
+  document.getElementById('lbl-utils').textContent = u.layers.utils;
+  document.getElementById('arrow1').textContent = u.arrows[0];
+  document.getElementById('arrow2').textContent = u.arrows[1];
+  document.getElementById('arrow3').textContent = u.arrows[2];
+  document.getElementById('d-agent').textContent = lang === 'es' ? 'Agente' : 'Agent';
+  document.getElementById('d-guards').textContent = 'Guardrails';
+  document.getElementById('d-ctx').textContent = lang === 'es' ? 'Ventana de Contexto' : 'Context Window';
+}
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-es').classList.toggle('active', l==='es');
+  document.getElementById('btn-en').classList.toggle('active', l==='en');
+  updateStaticUI();
+  renderCards();
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  activeFilter = e.target.dataset.filter;
+  renderCards();
+});
+
+renderCards();
+</script>
+</body>
+</html>
