@@ -182,6 +182,12 @@
     h1 { font-size: 2.2rem; }
     .search-input { width: 100%; }
   }
+  .card-flow { margin-top: 1.25rem; }
+  .flow-label { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--card-color, var(--accent)); margin-bottom: 0.6rem; }
+  .flow-steps { display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem; font-family: 'Space Mono', monospace; font-size: 0.7rem; }
+  .flow-step { padding: 0.22rem 0.55rem; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid currentColor; color: var(--card-color, var(--accent)); }
+  .flow-arrow { color: var(--card-color, var(--accent)); font-size: 0.75rem; opacity: 0.7; }
+
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
@@ -302,6 +308,32 @@ const CARDS = [
     }
   },
   {
+    id:'tokenizacion', color:'#c4b5fd', category:'core', interview:true,
+    title:{es:'Tokenización',en:'Tokenization'}, abbr:{es:'Proceso de dividir texto en tokens',en:'Process of splitting text into tokens'}, tag:{es:'core',en:'core'},
+    desc:{
+      es:'El primer paso antes de que el modelo procese cualquier texto. No divide por palabras: usa un vocabulario de <em>subpalabras frecuentes</em> aprendidas del corpus de entrenamiento. Por eso el español suele costar más tokens que el inglés.',
+      en:'The first step before the model processes any text. It does not split by words: it uses a vocabulary of <em>frequent subwords</em> learned from the training corpus. This is why Spanish text usually costs more tokens than English.'
+    },
+    uses:{
+      es:['"tokenización" → 4–5 tokens · "tokenization" → 3 tokens','El español cuesta más: morfología más rica, menos frecuente en el corpus de entrenamiento','Cada modelo tiene su propio tokenizador (GPT-4 usa cl100k_base, Claude tiene el suyo)'],
+      en:['"tokenization" → 3 tokens · "tokenización" → 4–5 tokens','Spanish costs more: richer morphology, less represented in training data','Each model has its own tokenizer (GPT-4 uses cl100k_base, Claude has its own)']
+    },
+    flow:{
+      label:{es:'Flujo real',en:'Actual flow'},
+      steps:{
+        es:['texto crudo','tokens (subpalabras)','IDs numéricos','el modelo procesa'],
+        en:['raw text','tokens (subwords)','numeric IDs','model processes']
+      }
+    },
+    analogy:{
+      label:{es:'Analogía',en:'Analogy'},
+      text:{
+        es:'El texto es como un billete: el tokenizador lo parte en monedas según su propio sistema. El costo se mide en monedas, no en billetes.',
+        en:'Text is like a banknote: the tokenizer breaks it into coins according to its own system. Cost is counted in coins, not bills.'
+      }
+    }
+  },
+  {
     id:'prompt', color:'#818cf8', category:'core', interview:true,
     title:{es:'Prompt',en:'Prompt'}, abbr:{es:'Instrucción al modelo',en:'Input instruction to the model'}, tag:{es:'core',en:'core'},
     desc:{
@@ -388,6 +420,13 @@ const CARDS = [
       es:['Permite buscar por significado, no solo por palabras exactas','Se almacenan en bases de datos vectoriales','Clave para implementar RAG'],
       en:['Enables search by meaning, not just exact keywords','Stored in vector databases','Key to implementing RAG']
     },
+    flow:{
+      label:{es:'Flujo de uso',en:'Usage flow'},
+      steps:{
+        es:['texto / consulta','modelo de embeddings','vector [0.21, -0.33, ...]','vector store','resultados semánticos'],
+        en:['text / query','embedding model','vector [0.21, -0.33, ...]','vector store','semantic results']
+      }
+    },
     analogy:{
       label:{es:'Analogía',en:'Analogy'},
       text:{
@@ -426,6 +465,13 @@ const CARDS = [
       es:['El modelo responde sobre <em>tus</em> datos sin re-entrenarlo','Reduce alucinaciones al anclar en fuentes reales','Flujo: pregunta → buscar docs → LLM responde con esos docs'],
       en:['The model answers about <em>your</em> data without retraining','Reduces hallucinations by grounding in real sources','Flow: question → retrieve docs → LLM answers with those docs']
     },
+    flow:{
+      label:{es:'Flujo típico',en:'Typical flow'},
+      steps:{
+        es:['pregunta del usuario','embedding de la pregunta','buscar en vector store','docs relevantes → contexto','LLM genera respuesta'],
+        en:['user question','question embedding','search vector store','relevant docs → context','LLM generates answer']
+      }
+    },
     analogy:{
       label:{es:'Analogía',en:'Analogy'},
       text:{
@@ -444,6 +490,13 @@ const CARDS = [
     uses:{
       es:['Puede buscar en internet, ejecutar código, leer archivos, llamar APIs','Decide por sí solo qué herramienta usar y cuándo','Opera en bucles: acción → observar resultado → siguiente acción'],
       en:['Can search the web, execute code, read files, call APIs','Decides on its own which tool to use and when','Operates in loops: action → observe result → next action']
+    },
+    flow:{
+      label:{es:'Ciclo del agente',en:'Agent loop'},
+      steps:{
+        es:['objetivo','LLM decide acción','ejecutar tool','observar resultado','¿objetivo cumplido?'],
+        en:['goal','LLM decides action','execute tool','observe result','goal reached?']
+      }
     },
     analogy:{
       label:{es:'Analogía',en:'Analogy'},
@@ -645,6 +698,11 @@ function renderCards() {
       </div>
       <p class="card-desc">${c.desc[lang]}</p>
       <ul class="card-uses">${c.uses[lang].map(u=>`<li>${u}</li>`).join('')}</ul>
+      ${c.flow ? `
+      <div class="card-flow">
+        <div class="flow-label">${c.flow.label[lang]}</div>
+        <div class="flow-steps">${c.flow.steps[lang].map((s,i,arr)=>`<span class="flow-step">${s}</span>${i<arr.length-1?'<span class="flow-arrow">→</span>':''}`).join('')}</div>
+      </div>` : ''}
       <div class="card-analogy">
         <div class="analogy-label">${c.analogy.label[lang]}</div>
         <p>${c.analogy.text[lang]}</p>
