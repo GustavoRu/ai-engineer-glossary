@@ -796,6 +796,19 @@ const INTERVIEW_QS = [
       es:['LangSmith: tracing nativo LangChain/LangGraph — cada tool call, input, output, latencia por paso','RAGAS: métricas para RAG — faithfulness (¿responde desde el contexto?), answer relevancy, context recall','DeepEval: unit tests para LLMs, assertions sobre el output del modelo','Métricas propias: task completion rate, herramientas usadas correctamente, latencia total','Logging estructurado: qué herramientas llamó, en qué orden, con qué parámetros'],
       en:['LangSmith: native LangChain/LangGraph tracing — each tool call, input, output, latency per step','RAGAS: RAG metrics — faithfulness (does it answer from context?), answer relevancy, context recall','DeepEval: unit tests for LLMs, assertions on model output','Custom metrics: task completion rate, correct tool usage, total latency','Structured logging: which tools called, in what order, with what parameters']
     }
+  },
+  {
+    id:'iq-context-eng',
+    tags:['context','prompt','rag','agent'],
+    q:{es:'¿Qué es context engineering?',en:'What is context engineering?'},
+    answer:{
+      es:'El arte de diseñar <em>qué información</em> entra en el context window del modelo y cómo está estructurada. Va más allá del prompt engineering: incluye memoria, RAG, historial, outputs de herramientas y compresión de contexto.',
+      en:'The craft of designing <em>what information</em> enters the model\'s context window and how it\'s structured. Goes beyond prompt engineering: includes memory, RAG, history, tool outputs, and context compression.'
+    },
+    points:{
+      es:['Prompt engineering = cómo formulás la instrucción. Context engineering = qué ponés en toda la ventana','El output del modelo depende casi completamente de lo que entra en contexto — calidad in, calidad out','Técnicas: RAG para conocimiento externo, compresión de historial, memoria selectiva, ordenar info por relevancia','En agentes: contexto crece con cada tool call — hay que decidir qué mantener y qué descartar','Cada token cuesta dinero y latencia: información densa y relevante supera a contexto largo y ruidoso'],
+      en:['Prompt engineering = how you write the instruction. Context engineering = what you put in the whole window','Model output depends almost entirely on what enters context — quality in, quality out','Techniques: RAG for external knowledge, history compression, selective memory, ordering info by relevance','In agents: context grows with each tool call — must decide what to keep and what to drop','Every token costs money and latency: dense, relevant information beats long, noisy context']
+    }
   }
 ];
 
