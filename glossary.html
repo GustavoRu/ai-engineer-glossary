@@ -809,6 +809,33 @@ const INTERVIEW_QS = [
       es:['Prompt engineering = cómo formulás la instrucción. Context engineering = qué ponés en toda la ventana','El output del modelo depende casi completamente de lo que entra en contexto — calidad in, calidad out','Técnicas: RAG para conocimiento externo, compresión de historial, memoria selectiva, ordenar info por relevancia','En agentes: contexto crece con cada tool call — hay que decidir qué mantener y qué descartar','Cada token cuesta dinero y latencia: información densa y relevante supera a contexto largo y ruidoso'],
       en:['Prompt engineering = how you write the instruction. Context engineering = what you put in the whole window','Model output depends almost entirely on what enters context — quality in, quality out','Techniques: RAG for external knowledge, history compression, selective memory, ordering info by relevance','In agents: context grows with each tool call — must decide what to keep and what to drop','Every token costs money and latency: dense, relevant information beats long, noisy context']
     }
+  },
+  {
+    id:'iq-agent-patterns',
+    tags:['agent','langgraph','langchain'],
+    q:{es:'¿Cuáles son los principales patrones de diseño para agentes?',en:'What are the main design patterns for AI agents?'},
+    answer:{
+      es:'Cada patrón resuelve un problema distinto de control, confiabilidad o colaboración. Elegir el correcto depende de cuánta autonomía querés darle al agente y qué tan críticos son los errores.',
+      en:'Each pattern solves a different problem around control, reliability, or collaboration. Choosing the right one depends on how much autonomy you want to give the agent and how critical errors are.'
+    },
+    points:{
+      es:[
+        '<strong>ReAct</strong>: Reason → Act → Observe en loop. El agente razona qué hacer, ejecuta, observa el resultado y repite. Patrón base de la mayoría de agentes',
+        '<strong>Plan and Execute</strong>: genera un plan completo de pasos antes de ejecutar. Más determinista — útil cuando los pasos son interdependientes o costosos de revertir',
+        '<strong>PRD (Product Requirements Document)</strong>: el agente genera un documento de especificaciones estructurado (qué construir, requisitos, constraints) antes de ejecutar. Similar a Plan and Execute pero con output formal; ideal para combinar con Human in the Loop',
+        '<strong>Reflection</strong>: el agente critica su propio output y lo itera antes de responder. Mejora calidad a costa de latencia y tokens',
+        '<strong>Human in the Loop</strong>: checkpoints donde un humano aprueba, corrige o redirige antes de continuar. Esencial en flujos críticos o irreversibles',
+        '<strong>Multi-Agent</strong>: agentes especializados que se delegan trabajo entre sí (orquestador + subagentes). Permite paralelismo y separación de responsabilidades'
+      ],
+      en:[
+        '<strong>ReAct</strong>: Reason → Act → Observe in a loop. Agent reasons what to do, executes, observes result and repeats. Base pattern for most agents',
+        '<strong>Plan and Execute</strong>: generates a full step-by-step plan before executing. More deterministic — useful when steps are interdependent or costly to reverse',
+        '<strong>PRD (Product Requirements Document)</strong>: agent generates a structured spec document (what to build, requirements, constraints) before executing. Similar to Plan and Execute but with formal output; ideal to combine with Human in the Loop',
+        '<strong>Reflection</strong>: agent critiques its own output and iterates before responding. Improves quality at the cost of latency and tokens',
+        '<strong>Human in the Loop</strong>: checkpoints where a human approves, corrects, or redirects before continuing. Essential in critical or irreversible workflows',
+        '<strong>Multi-Agent</strong>: specialized agents that delegate work to each other (orchestrator + subagents). Enables parallelism and separation of concerns'
+      ]
+    }
   }
 ];
 
